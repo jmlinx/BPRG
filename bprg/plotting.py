@@ -3,7 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 KWARGS = {'prog': 'twopi', 'root': 0}
-NODE_SIZE = 23
+EDGE_OPTIONS = {
+    'width': 0.1,
+    'alpha': 0.3,
+}
+NODE_OPTIONS = {
+    'node_size': 17,
+    'alpha':0.9,    
+}
 FIGSIZE = (6, 6)
 
 class PercolationViz():
@@ -43,7 +50,7 @@ class PercolationViz():
     def adjacency_to_edges(self):
         edges = [(i,j) for i in range(self.nv)
                  for j in range(self.nv)
-                 if self.A[i,j]==1 and i < j]
+                 if self.A[i,j]==1 and i!=j]
         return edges
 
     def index_by_group(self, kv, k_list):
@@ -63,25 +70,19 @@ class PercolationViz():
         return edge_dict
 
 
-    def plot_network_infection(self, G, pos, ikv,
-                              iedge, figsize=FIGSIZE,
-                              node_size=NODE_SIZE, ax=None):
-        options = {
-        'node_size': node_size,
-        'alpha':0.9,    
-        }
+    def plot_network_infection(self, G, pos, ikv, iedge,
+                               figsize=FIGSIZE,  ax=None,
+                               node_options=NODE_OPTIONS,
+                               edge_options=EDGE_OPTIONS):
         node_color_list = ['violet', 'turquoise', 'springgreen']
         edge_color_list = ['violet', 'violet', 'springgreen']
-        edge_options = {
-            'width': 0.2,
-            'alpha': 0.6,
-        }
+
 
         for k in range(self.K + 1):
             nodelist = [i for i in ikv[k] if i in pos.keys()]
             nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=nodelist,
                                    node_color=node_color_list[k],
-                                   **options)
+                                   **node_options)
 
             edgelist = iedge[k]
             nx.draw_networkx_edges(G, pos, ax=ax, edgelist=edgelist,
@@ -90,7 +91,9 @@ class PercolationViz():
         plt.tight_layout()
         plt.axis("off")
     
-    def get_percolation_plots(self, figsize=FIGSIZE, node_size=NODE_SIZE):
+    def get_percolation_plots(self, figsize=FIGSIZE,
+                              node_options=NODE_OPTIONS,
+                              edge_options=EDGE_OPTIONS):
         G = self.G
         pos = self.pos
         ikv_list = self.ikv_list
@@ -103,17 +106,22 @@ class PercolationViz():
             iedge = iedge_list[i]
             fig = plt.figure(figsize=figsize)
             self.plot_network_infection(
-                G, pos, ikv, iedge, figsize, node_size, ax=None)
+                G, pos, ikv, iedge, figsize, ax=None,
+                node_options=node_options, edge_options=edge_options)
             figs.append(fig)            
         return figs
     
     def get_percolation_plot(self, nrows, ncols, idx_list,
                              figsize=(12,8), subfigsize=FIGSIZE,
-                             node_size=NODE_SIZE):
+                             node_options=NODE_OPTIONS,
+                             edge_options=EDGE_OPTIONS
+                             ):
         fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
         for i, ax in zip(idx_list, np.ravel(axes)):
             self.plot_network_infection(
                 self.G, self.pos, self.ikv_list[i], self.iedge_list[i],
-                node_size=node_size, figsize=subfigsize, ax=ax)
+                figsize=subfigsize, ax=ax,
+                node_options=node_options,
+                edge_options=edge_options)
             ax.axis("off")
         return fig
