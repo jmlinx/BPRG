@@ -78,7 +78,7 @@ class PercolationViz():
         edge_color_list = ['violet', 'violet', 'springgreen']
 
 
-        for k in range(self.K + 1):
+        for k in np.arange(self.K, -1, -1):
             nodelist = [i for i in ikv[k] if i in pos.keys()]
             nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=nodelist,
                                    node_color=node_color_list[k],
@@ -101,7 +101,7 @@ class PercolationViz():
 
         figs = []
         
-        for i in range(len(self.kv_list)):
+        for i in range(len(self.ikv_list)):
             ikv = ikv_list[i]
             iedge = iedge_list[i]
             fig = plt.figure(figsize=figsize)
